@@ -1,0 +1,14 @@
+*
+{
+    margin: 0;
+    padding: 0;
+    border: none;
+    
+}
+.img
+{
+    background-color: red;
+    background-clip: content-box;
+    -webkit-background-clip: content-box,
+    vis
+}
