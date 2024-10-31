@@ -17,7 +17,7 @@ const Header = () => {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    gap: "12px",
+    gap: "18px",
     marginRight: "8px",
   });
 
@@ -38,16 +38,17 @@ const Header = () => {
           <AppBar position="sticky">
             <StyledToolbar>
               <IconContainer>
-                <Badge badgeContent={4} color="error" sx={{ display: { xs: "none", sm: "flex", marginRight: 1 } }}>
-                  <NotificationsOutlined fontSize="large" sx={{ fontSize: "30px", color: "#1E1E1E", backgroundColor: "#C7ECFF", borderRadius: "4px" }} />
+                <Badge badgeContent={4} color="error" sx={{ display: { xs: "none", sm: "flex", right:1.1 } }}>
+                  <NotificationsOutlined fontSize="large" sx={{ fontSize: "27.4px", color: "#2e2e2e",position:"relative",top:1, }} />
                 </Badge>
-                <Box component={"span"} width={34} height={36} backgroundColor="#C7ECFF" borderRadius={"4px"}>
-                  <Avatar alt="Remy Sharp" src={images.officemanImg} sx={{ width: "33px", height: "33px" }} />
+                
+                <Box sx={{ display: "flex", gap: "5px",alignItems:"center" }}>
+                <Box component={"span"} width={32} height={34} border={"1.1px solid #6666FF"}backgroundColor="#9c9cff  " borderRadius={"28px"}>
+                  <Avatar alt="Remy Sharp" src={images.officemanImg} sx={{ width: "29px", height: "29px",top:2,left:1 }} />
                 </Box>
-                <Box sx={{ display: "flex", gap: "5px" }}>
                   <Box>
-                    <Typography variant="h6" sx={{ color: "#1E1E1E", fontSize: "18px" }}>Rahul</Typography>
-                    <Typography variant="body2" sx={{ color: "#1E1E1E" }}>Admin</Typography>
+                    <Typography variant="h6" sx={{ color: "#1E1E1E", fontSize: "1rem" }}>Rahul</Typography>
+                    <Typography variant="body2" sx={{ color: "#1E1E1E",fontSize:"0.800rem" }}>Admin</Typography>
                   </Box>
                   
                   {/* Conditional Rendering of Arrows */}
@@ -60,7 +61,7 @@ const Header = () => {
 
                 {/* Dropdown Menu */}
                 <Menu
-                  sx={{ position: "absolute", top: "56px" }}
+                  sx={{ position: "absolute", top: "48.334px",}}
                   id="demo-positioned-menu"
                   aria-labelledby="demo-positioned-button"
                   open={open}
@@ -71,10 +72,10 @@ const Header = () => {
                   }}
                   transformOrigin={{
                     vertical: "top",
-                    horizontal: "left",
+                    horizontal: "right",
                   }}
                 >
-                  <MenuItem>
+                  <MenuItem >
                     <Box sx={{ display: "flex", alignContent: "center", marginRight: "5px" }}>
                       <img src={images.Customericon} alt="CustomerIcon" />
                     </Box>

@@ -21,13 +21,12 @@ const LoginScreen = () => {
         textAlign: "center",
       }}
     >
-      <Box>
-        <img
-          src={images.codersnest}
+      <img
+          src={images.CN_Vertical}
           alt="Coders Nest"
-          style={{ width: "60%", height: "auto" }}
+          style={{ width: "50%", height: "auto" }}
         />
-      </Box>
+      
 
       <Typography component="h2" variant="h5" sx={{ marginTop: ".5rem" }}>
         Login to Access CN Books
@@ -42,7 +41,7 @@ const LoginScreen = () => {
           width: "40%",
           textTransform: "none",
           fontSize:"1rem",
-          backgroundColor: "#5db2ff",
+          backgroundColor: "#6666FF",
           "&:hover": {
             backgroundColor: "#539gd2",
           },
@@ -53,7 +52,7 @@ const LoginScreen = () => {
 
       <Typography>
         Don’t have an account?{" "}
-        <Link href="/signup" variant="body2" sx={{ color: "#5db2ff", textDecoration:"none" }}>
+        <Link href="/signup" variant="body2" sx={{ color: "#6666FF", textDecoration:"none" }}>
           Sign Up
         </Link>
       </Typography>

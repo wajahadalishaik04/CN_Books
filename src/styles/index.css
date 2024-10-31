@@ -5,3 +5,8 @@
     border: none;
     
 }
+.custom-textarea::placeholder {
+    font-size: 14px; /* Decrease placeholder font size */
+    color: #aaa; /* Optional: lighter color for placeholder text */
+  }
+  

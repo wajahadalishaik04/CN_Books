@@ -1,7 +1,10 @@
 export const images ={
     backgroundImg:"./images/BackgroundImg.jpeg",
-    codersnest:"./images/codersnest.png",
-    codersnestLogo:"./images/codersnest1.png",
+    CN_Horizontal:"./images/CN-Horizontal.png",
+    CN_Logo:'./images/CN-Logo.png',
+    CN_Vertical:"./images/CN-Vertical.png",
+    CN_Logo_Mark:"./images/CN-Logo-Mark.jpg",
+    backgroundHeader:"./images/BackgroundHeader.png",
     loginImg:"./images/login_illustration.png",
     otpImg:"./images/otpImg.png",
     signupImg:"./images/signup.png",
@@ -30,5 +33,7 @@ export const images ={
     hiddenicon:"./images/HiddenIcon.png",
     verticaldoticon:"./images/VerticalDots.png",
     dollararrowicon:"./images/dollarArrow.png",
-    doticon:"./images/dotIcon.png"
+    doticon:"./images/dotIcon.png",
+    Rightarrow:"./images/rightArrow.png",
+    mastercardImg:"./images/mastercard.png"
 }

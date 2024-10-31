@@ -9,6 +9,7 @@ import {
   Tooltip,
   Checkbox,
   FormControlLabel,
+  useMediaQuery,
 } from "@mui/material";
 import { CheckCircle, Info as InfoIcon } from "@mui/icons-material";
 import { images } from "../utils/ImgUtils";
@@ -24,6 +25,7 @@ const SignUp = () => {
   const [passwordError, setPasswordError] = useState(false);
   const [checkboxError, setCheckboxError] = useState(false); // Added for checkbox
   const [formSubmitted, setFormSubmitted] = useState(false); // To track form submission attempt
+  const isMobile = useMediaQuery("(max-width:600px)");
 
   // Password validation state
   const [passwordValidations, setPasswordValidations] = useState({
@@ -82,6 +84,12 @@ const SignUp = () => {
     setCheckboxChecked(e.target.checked);
     setCheckboxError(!e.target.checked); // Added to show error if unchecked
   };
+  // Keyboard event handler for "Enter" key
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
 
   // Submit handler
   const handleSubmit = () => {
@@ -106,6 +114,7 @@ const SignUp = () => {
   return (
     <>
       <Box
+        flex={1}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -122,12 +131,12 @@ const SignUp = () => {
           marginTop={2}
           borderRadius="8px"
           overflow="hidden"
-          width={{ xs: "90%", sm: "800px" }}
+          width={isMobile ? "90%" : "800px"}
           height="auto"
-          sx={{ flexDirection: { xs: "column", sm: "row" } }}
+          sx={{ flexDirection: isMobile ? "column" : "row" }}
         >
           {/* Left Side - Sign Up Form */}
-          <Box flex={1} p={6} >
+          <Box flex={1} p={6}>
             <Box
               display="flex"
               justifyContent="space-between"
@@ -135,12 +144,12 @@ const SignUp = () => {
               sx={{ position: "relative", right: "7px" }}
             >
               <img
-                src={images.codersnestLogo}
+                src={images.CN_Horizontal}
                 alt="Logo"
-                style={{ width: 200 }}
+                style={{ width: 180, maxWidth: "100%" }}
               />
             </Box>
-            <Box width={"330px"} flex={1} component={"form"}>
+            <Box width={isMobile ? "100%" : "330px"} flex={1}>
               <Typography variant="h5" fontWeight={500} mt={2} mb={2}>
                 Sign up to access CN Books
               </Typography>
@@ -154,6 +163,7 @@ const SignUp = () => {
                   placeholder="Enter Email Id/ Mobile Number"
                   fullWidth
                   value={emailMobile}
+                  onKeyDown={handleKeyDown} // Keyboard event for Enter key
                   onChange={handleEmailMobileChange}
                   error={emailError && formSubmitted}
                   sx={{
@@ -170,10 +180,10 @@ const SignUp = () => {
                 {/* Display the error message separately in a <p> element */}
                 {emailError && formSubmitted && (
                   <Typography
-                  color="error"
-                  variant="body2"
+                    color="error"
+                    variant="body2"
                     style={{
-                      paddingLeft:"3px",
+                      paddingLeft: "3px",
                       fontSize: "0.875rem",
                       marginTop: "4px",
                     }}
@@ -193,6 +203,7 @@ const SignUp = () => {
                   required
                   value={password}
                   onChange={handlePasswordChange}
+                  onKeyDown={handleKeyDown} // Keyboard event for Enter key
                   error={passwordError && formSubmitted}
                   InputProps={{
                     endAdornment: (
@@ -222,7 +233,7 @@ const SignUp = () => {
                                 style={{
                                   color: passwordValidations.lowercase
                                     ? "#5BC4FA"
-                                    :  " #F3F3F3"
+                                    : " #F3F3F3",
                                 }}
                               >
                                 <CheckCircle /> One lowercase letter
@@ -269,12 +280,13 @@ const SignUp = () => {
                 />
                 {/* Separate <p> element for error message */}
                 {passwordError && formSubmitted && (
-                  <Typography variant="body2"color="error"
+                  <Typography
+                    variant="body2"
+                    color="error"
                     sx={{
-                      paddingLeft:"3px",
+                      paddingLeft: "3px",
                       fontSize: "0.875rem",
                       marginTop: "4px",
-                      
                     }}
                   >
                     Please enter a valid password
@@ -284,6 +296,7 @@ const SignUp = () => {
 
               {/* Checkbox */}
               <FormControlLabel
+               sx={{marginTop:1.5}}
                 required
                 control={
                   <Checkbox
@@ -305,7 +318,7 @@ const SignUp = () => {
                 variant="contained"
                 fullWidth
                 sx={{
-                  backgroundColor: "#5BC4FA",
+                  backgroundColor: "#6666FF",
                   mt: 2,
                   textTransform: "none",
                   fontSize: "1rem",
@@ -317,7 +330,13 @@ const SignUp = () => {
                 Or login with
               </Typography>
               {/* Social Icons */}
-              <Box display="flex" justifyContent="flex-start" gap={2} mt={1}>
+              <Box
+                display="flex"
+                justifyContent={ "flex-start"}
+                gap={2}
+                mt={1}
+                
+              >
                 <img src={images.googleicon} width={24} alt="googleicon" />
                 <img src={images.facebookicon} width={24} alt="facebookicon" />
                 <img src={images.linkedinicon} width={24} alt="linkedinicon" />
@@ -331,7 +350,7 @@ const SignUp = () => {
                 <Link
                   to={"/signin"}
                   style={{
-                    color: "#5BC4FA",
+                    color: "#6666FF",
                     textDecoration: "none",
                     marginLeft: 2.5,
                   }}
@@ -341,12 +360,13 @@ const SignUp = () => {
               </Typography>
             </Box>
           </Box>
-          {/* Right Side - Illustration Image */}
           <Box sx={{ borderRight: "1.5px solid #EFEFEF" }}></Box>
-          <Box
+          {/* Right Side - Illustration Image */}
+          {!isMobile &&(
+            <Box
             flex={1}
             sx={{
-              display: { xs: "none", sm: "block" ,padding:"14px"},
+              display: { xs: "none", sm: "block", padding: "14px" },
             }}
           >
             <img
@@ -359,6 +379,8 @@ const SignUp = () => {
               }}
             />
           </Box>
+          )}
+          
         </Box>
       </Box>
     </>

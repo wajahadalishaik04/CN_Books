@@ -7,8 +7,10 @@ import {
   Snackbar,
   Alert,
   styled,
+  useMediaQuery,
 } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
+import { images } from "../utils/ImgUtils";
 
 const VerifyScreen = () => {
   const [isResendDisabled, setIsResendDisabled] = useState(false); // To disable and hide the Resend button
@@ -21,10 +23,12 @@ const VerifyScreen = () => {
   const [error, setError] = useState(false); // State for OTP input error
   const [helperText, setHelperText] = useState(""); // State for helper text under the input field
   const [isVerifyDisabled, setIsVerifyDisabled] = useState(true); // Disable "Verify" button initially
+const isMobile =  useMediaQuery('(max-width:600px)'); // Media query for mobile devices
 
   const StyledButton = styled(Button)({
     fontSize: "1rem",
     textTransform: "none",
+    color:'#6666FF'
   });
 
   const navigate = useNavigate();
@@ -65,6 +69,15 @@ const VerifyScreen = () => {
     return () => clearInterval(interval); // Cleanup interval on unmount
   }, [timer, isResendDisabled]);
 
+  // Keyboard event handler for "Enter" key
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
+  
+
   // Handle OTP form submission
   const handleSubmit = () => {
     if (!otp) {
@@ -72,6 +85,7 @@ const VerifyScreen = () => {
       setHelperText("Please enter the OTP.");
       return; // Prevent submission if OTP is not entered
     }
+      // Keyboard event handler for "Enter" key
 
     if (otp === generatedOtp.toString()) {
       setError(false); // Clear error state
@@ -123,11 +137,12 @@ const VerifyScreen = () => {
         marginTop={2}
         borderRadius="8px"
         overflow="hidden"
-        width="800px"
+        width={isMobile ? "90%" : "800px"}
+        flexDirection={isMobile ? "column" : "row"}
         height="500px"
       >
         <Box flex={1} p={6} mt={1}>
-          <Box flex={1} width={"330px"}>
+          <Box flex={1} width={isMobile ? "100%" : "330px"}>
             <Box
               display="flex"
               component={"form"}
@@ -136,18 +151,18 @@ const VerifyScreen = () => {
               sx={{ position: "relative", right: "7px" }}
             >
               <img
-                src="/images/codersnest1.png"
+                src={images.CN_Horizontal}
                 alt="Logo"
-                style={{ width: 200 }}
+                style={{ width: 180,maxWidth:"100%" }}
               />
             </Box>
             <Typography variant="h5" fontWeight={500} mt={2} mb={1}>
               Sign up to access CN Books
             </Typography>
-            <Typography varient="body2" mb={1} fontWeight={450}>
+            <Typography varient="body2" mb={0.9} fontWeight={450}>
               Verify your Sign Up
             </Typography>
-            <Typography>
+            <Typography marginTop={0.3}>
               Enter the OTP sent to your mobile number or email.
             </Typography>
             <Box sx={{ display: "flex", alignItems: "center" }}>
@@ -164,6 +179,7 @@ const VerifyScreen = () => {
               onChange={(e) => setOtp(e.target.value)} // Update OTP state as the user types
               placeholder="Enter OTP"
               error={error} // Display error state if OTP is invalid
+              onKeyDown={handleKeyDown} // Keyboard event for Enter key
               helperText={helperText} // Show the error message below the input
               sx={{
                 width: "100%",
@@ -197,7 +213,7 @@ const VerifyScreen = () => {
               onClick={handleSubmit}
               variant="contained"
               fullWidth
-              sx={{ backgroundColor: "#5BC4FA", mt: 1 }}
+              sx={{ backgroundColor: "#6666FF", mt: 1 ,color:"white"}}
               disabled={isVerifyDisabled} // Disable the Verify button until OTP is entered
             >
               Verify
@@ -205,23 +221,26 @@ const VerifyScreen = () => {
           </Box>
         </Box>
         <Box sx={{ borderRight: "1.5px solid #EFEFEF" }}></Box>
-
-        <Box
-          flex={1}
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          sx={{ display: { xs: "none", sm: "flex" } }}
-        >
-          <img
-            src="/images/otpImg.png"
-            alt="Illustration"
-            width="98%"
-            height="93%"
-            objectFit="cover"
-          />
-        </Box>
-      </Box>
+        {/* right side illustration image */}
+        {!isMobile &&(
+           <Box
+           flex={1}
+           display="flex"
+           justifyContent="center"
+           alignItems="center"
+           sx={{ display: { xs: "none", sm: "flex" } }}
+         >
+           <img
+             src="/images/otpImg.png"
+             alt="Illustration"
+             width="94%"
+             height="90%"
+             objectFit="cover"
+           />
+         </Box>
+        )}
+       
+      
 
       {/* Snackbar for success messages only */}
       <Snackbar
@@ -238,6 +257,7 @@ const VerifyScreen = () => {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+    </Box>
     </Box>
   );
 };

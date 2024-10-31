@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import CategoryTable from "../components/Tables/CategoryTable";
+import TimeSheetTable from "../components/Tables/TimeSheetTable";
 import { Box, Paper } from "@mui/material";
 
-const Category = () => {
+const TimeSheet = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const containerRef = useRef(null); // Reference for the scrollable container
 
@@ -62,10 +62,10 @@ const Category = () => {
           overflowX: "hidden",
         }}
       >
-        <CategoryTable />
+        <TimeSheetTable />
       </Box>
     </>
   );
 };
 
-export default Category;
+export default TimeSheet;

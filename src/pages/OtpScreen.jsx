@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Box, Button, TextField, Typography, styled, Snackbar, Alert } from "@mui/material";
+import { Box, Button, TextField, Typography, styled, Snackbar, Alert, useMediaQuery } from "@mui/material";
 import { images } from "../utils/ImgUtils";
 import { useLocation, useNavigate } from "react-router-dom";
 
@@ -11,6 +11,7 @@ const OtpScreen = () => {
   const [verifyEnabled, setVerifyEnabled] = useState(false); // Enable/disable Verify button
   const [resendCountdown, setResendCountdown] = useState(0); // Countdown for Resend button
   const [resendDisabled, setResendDisabled] = useState(false); // Disable Resend button
+  const isMobile = useMediaQuery("(max-width:600px)")
   
   const navigate = useNavigate();
   const location = useLocation();
@@ -19,6 +20,7 @@ const OtpScreen = () => {
   const ResendOtp = styled(Button)({
     textTransform: "none",
     fontSize: "1rem",
+    color:"#6666FF"
   });
 
   // Function to generate and send OTP
@@ -46,6 +48,12 @@ const OtpScreen = () => {
       setResendDisabled(false); // Re-enable the Resend button after countdown
     }
   }, [resendCountdown]);
+  // Keyboard event handler for "Enter" key
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
 
   // Handle OTP submission
   const handleSubmit = () => {
@@ -54,7 +62,7 @@ const OtpScreen = () => {
       setOpenSnackbar(true);
       setError(""); // Clear any existing error
       setTimeout(() => {
-        navigate("/dashboardscreen");
+        navigate("/home");
       }, 1500); // Delay redirect to allow Snackbar to show
     } else {
       setError("Invalid OTP. Please try again.");
@@ -91,13 +99,14 @@ const OtpScreen = () => {
         marginTop={2}
         borderRadius="8px"
         overflow="hidden"
-        width="800px"
+        width={isMobile?"90%" : "800px"}
+        flexDirection={isMobile?"column" : "row"}
         height="500px"
       >
-        <Box flex={1} p={4.5} mt={1} component={"form"}>
-          <Box flex={1} sx={{ width: "330px" }}>
+        <Box flex={1} p={4.5} mt={1} >
+          <Box flex={1} sx={ isMobile ? "100%" : "330px" }>
             <Box display="flex" justifyContent="space-between" alignItems="center">
-              <img src={images.codersnestLogo} alt="Logo" style={{ width: 200 }} />
+              <img src={images.CN_Horizontal} alt="Logo" style={{ width: 180, maxWidth: "100%" }} />
             </Box>
             <Typography variant="h5" fontWeight={500} mt={2}>
               Verify OTP
@@ -122,6 +131,7 @@ const OtpScreen = () => {
               placeholder="Enter OTP"
               fullWidth
               value={otp}
+              onKeyDown={handleKeyDown} // Keyboard event for Enter key
               onChange={(e) => setOtp(e.target.value)}
               sx={{
                 fontWeight: "500",
@@ -159,7 +169,7 @@ const OtpScreen = () => {
               fullWidth
               disabled={!verifyEnabled} // Disable button until OTP is filled
               sx={{
-                backgroundColor: verifyEnabled ? "#5BC4FA" : "#C0E8FB",
+                backgroundColor: verifyEnabled ? "#6666FF" : "#C0E8FB",
                 mt: 2,
                 textTransform: "none",
                 fontSize: "1rem",
@@ -185,7 +195,8 @@ const OtpScreen = () => {
         <Box sx={{ borderRight: "1.5px solid #EFEFEF" }}></Box>
 
         {/* Right Side - Illustration Image */}
-        <Box
+        {!isMobile && (
+          <Box
           flex={1}
           display="flex"
           justifyContent="center"
@@ -194,7 +205,9 @@ const OtpScreen = () => {
         >
           <img src={images.otpImg} alt="Illustration" width="350px" height="auto" />
         </Box>
-      </Box>
+        )}
+        
+      
 
       {/* Snackbar to show OTP */}
       <Snackbar
@@ -207,6 +220,7 @@ const OtpScreen = () => {
           {otp === generatedOtp.toString() ? "OTP verified successfully!" : `OTP sent: ${generatedOtp}`}
         </Alert>
       </Snackbar>
+    </Box>
     </Box>
   );
 };

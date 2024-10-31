@@ -25,32 +25,39 @@ import {
   IconButton,
   List,
 } from "@mui/material";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { images } from "../../utils/ImgUtils";
 
 const NewCustomer = () => {
+  // custom styling components
   const StyledTextField = styled(TextField)({
-    backgroundColor: "#F3F3F3",
-    color: "#939393",
-
-    "&:hover": {
-      backgroundColor: "#F3F3F3",
-    },
     "& .MuiOutlinedInput-root": {
+      backgroundColor: "#F3F3F3",
+
+      "&:hover": {
+        backgroundColor: "#F3F3F3",
+      },
       "&.Mui-focused": {
         backgroundColor: "#EBF9FF", // Focused background color
         borderColor: "#5BC4FA", // Focused border color
       },
     },
   });
-  const StyledButton = styled(Button)({
-    color: "#5BC4FA",
-    paddingLeft: 2,
-    paddingTop: 8,
+  // custom textfield helper class
+  const styledTextField = {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "#F3F3F3",
 
-    textTransform: "none",
-  });
+      "&:hover": {
+        backgroundColor: "#F3F3F3",
+      },
+      "&.Mui-focused": {
+        backgroundColor: "#EBF9FF", // Focused background color
+        borderColor: "#5BC4FA", // Focused border color
+      },
+    },
+  };
 
   // customer Type Radio
   const [value, setValue] = React.useState("");
@@ -75,6 +82,51 @@ const NewCustomer = () => {
     options: currencyNameOpt,
     getOptionLabel: (option) => option,
   };
+  // customer email input field functionality
+  const [email, setEmail] = useState("");
+  const [emailError, setEmailError] = useState(false);
+
+  const handleEmailChange = (e) => {
+    const value = e.target.value;
+    setEmail(value);
+
+    // Basic email validation regex
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    setEmailError(!emailRegex.test(value));
+  };
+  // customer work phone details input field functionality:
+  const [workPhone, setWorkPhone] = useState("");
+  const [workPhoneError, setWorkPhoneError] = useState(false);
+
+  const handleWorkPhoneChange = (e) => {
+    const value = e.target.value;
+
+    // Allow input only if the value has 10 digits or less
+    if (value.length <= 10) {
+      setWorkPhone(value);
+
+      // Validate work phone for exactly 10 digits
+      const workPhoneRegex = /^[0-9]{10}$/;
+      setWorkPhoneError(!workPhoneRegex.test(value));
+    }
+  };
+
+  // customer mobile details input field functionality:
+  const [mobile, setMobile] = useState("");
+  const [mobileError, setMobileError] = useState(false);
+
+  const handleMobileChange = (e) => {
+    const value = e.target.value;
+
+    // Allow input only if the value has 10 digits or less
+    if (value.length <= 10) {
+      setMobile(value);
+
+      // Validate mobile number for exactly 10 digits
+      const mobileRegex = /^[0-9]{10}$/;
+      setMobileError(!mobileRegex.test(value));
+    }
+  };
 
   // Gst Treatment Name Inputfield
   const GstTreatmentNameOpt = ["OFFLINE", "ONLINE"];
@@ -87,6 +139,22 @@ const NewCustomer = () => {
   const placeofSupplyName = {
     options: placeofSupplyNameOpt,
     getOptionLabel: (option) => option,
+  };
+  //pan card input field
+  const [pan, setPan] = useState("");
+  const [error, setError] = useState(false);
+
+  const handlePanChange = (e) => {
+    const value = e.target.value.toUpperCase();
+    setPan(value);
+
+    // PAN validation: 5 letters, 4 digits, and 1 letter (total 10 characters)
+    const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+    if (!panRegex.test(value)) {
+      setError(true);
+    } else {
+      setError(false);
+    }
   };
   // Tax Exempt Type Radio
   const [taxvalue, setTaxValue] = React.useState("");
@@ -106,17 +174,6 @@ const NewCustomer = () => {
     getOptionLabel: (option) => option,
   };
   // documents upload
-  const VisuallyHiddenInput = styled("input")({
-    clip: "rect(0 0 0 0)",
-    clipPath: "inset(50%)",
-    height: 1,
-    overflow: "hidden",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    whiteSpace: "nowrap",
-    width: 1,
-  });
   const [files, setFiles] = useState([]); // To store all selected files
   const [errorMessage, setErrorMessage] = useState("");
   const [uploadSuccess, setUploadSuccess] = useState("");
@@ -173,10 +230,11 @@ const NewCustomer = () => {
   // State for form fields for Billing and Shipping addresses
   const [billingAddress, setBillingAddress] = useState({
     attention: "",
-    countryRegion: null,
+    countryRegion: "",
     address: "",
+    address2: "",
     city: "",
-    state: null,
+    state: "",
     pinCode: "",
     phone: "",
     faxNumber: "",
@@ -184,23 +242,24 @@ const NewCustomer = () => {
 
   const [shippingAddress, setShippingAddress] = useState({
     attention: "",
-    countryRegion: null,
+    countryRegion: "",
     address: "",
+    address2: "",
     city: "",
-    state: null,
+    state: "",
     pinCode: "",
     phone: "",
     faxNumber: "",
   });
 
   // Handle input changes for billing address & shipping address
-  const handleInputChange = (addressType, field, value) => {
+  const handleAddressChange = (addressType, field, value) => {
     if (addressType === "billing") {
       setBillingAddress((prevState) => ({
         ...prevState,
         [field]: value,
       }));
-    } else {
+    } else if (addressType === "shipping") {
       setShippingAddress((prevState) => ({
         ...prevState,
         [field]: value,
@@ -208,9 +267,35 @@ const NewCustomer = () => {
     }
   };
 
+  // Ensure you have these handlers in place
+  const handleBillingAddressChange = (field, value) => {
+    handleAddressChange("billing", field, value);
+  };
+
+  const handleShippingAddressChange = (field, value) => {
+    handleAddressChange("shipping", field, value);
+  };
+
   // Copy billing address to shipping address
   const copyBillingToShipping = () => {
     setShippingAddress({ ...billingAddress });
+  };
+  // Function for phone validation (must be exactly 10 digits)
+  const validatePhoneNumber = (value) => {
+    const regex = /^[0-9]{10}$/; // Regular expression for exactly 10 digits
+    return regex.test(value);
+  };
+
+  // Function for pin code validation (must be exactly 6 digits)
+  const validatePinCode = (value) => {
+    const regex = /^[0-9]{6}$/; // Regular expression for 6 digits
+    return regex.test(value);
+  };
+
+  // Function for fax number validation (custom rule for length, example 6-12 digits)
+  const validateFaxNumber = (value) => {
+    const regex = /^[0-9]{6,12}$/; // Regular expression for 6-12 digits
+    return regex.test(value);
   };
 
   // Country/Region Inputfield
@@ -225,12 +310,7 @@ const NewCustomer = () => {
     options: stateOpt,
     getOptionLabel: (option) => option,
   };
-  // addMore button
-  const [addmore, setAddMore] = useState(false);
-  const callAddMoreToggle = () => {
-    setAddMore((prev) => !prev);
-  };
-  // menu Tabs section
+    // menu Tabs section
   const [tabsValue, setTabsValue] = useState(0);
 
   const handleTabChange = (event, newValue) => {
@@ -330,7 +410,54 @@ const NewCustomer = () => {
       "sales"
     ),
   ];
-  // footer next button
+  // Footer Section
+const [isFooterVisible,setFooterVisible] = useState(true) // To control footer visibility
+const [lastScrollY,setLastScrollY] = useState(0);
+const containerRef = useRef(null); // Reference for the scrollable container
+
+// Function to disable page Scrolling 
+const disablePageScroll = () =>{
+  document.body.style.overflow = 'hidden';
+}
+// Function to Enable page Scrolling 
+
+const enablePageScroll = () =>{
+  document.body.style.overflow = '';
+}
+useEffect(()=>{
+  const container = containerRef.current;
+   const handleScroll = ()=>
+   {
+    const currentScrollY = container.scrollTop; 
+    if(currentScrollY > lastScrollY)
+      {
+         // Scrolling down: Hide the footer
+         setFooterVisible(false)
+      } 
+      else {
+        // Scrolling up: Show the footer
+        setFooterVisible(true);
+      }
+      // Update the last scroll position
+      setLastScrollY(currentScrollY);
+   }
+   if (container) {
+    container.addEventListener("scroll", handleScroll);
+  }
+// Disable page scrolling on mount
+disablePageScroll();
+
+return () => {
+  // Cleanup event listener and enable page scrolling on unmount
+  if (container) {
+    container.removeEventListener("scroll", handleScroll);
+  }
+  enablePageScroll();
+};
+}, [lastScrollY]);
+
+
+  // next Button 
   const handleNextClick = () => {
     if (tabsValue < 3) {
       setTabsValue((prevValue) => prevValue + 1);
@@ -339,199 +466,277 @@ const NewCustomer = () => {
   const isLastTab = tabsValue === 3;
 
   return (
-    <Box sx={{ display: "flex", height: "100vh" }}>
-      <Box sx={{ flexGrow: 1 }}>
-        <Box padding={3}>
+    <>
+      <Box component={Paper} ref={containerRef} sx={{ 
+        maxHeight:620,
+        height: "calc(100vh - 57px)",
+        overflowY:"auto",
+        overflowX:"hidden",
+        position:'relative'
+       }}>
+        <Box
+          sx={{
+            paddingLeft: { xs: 1, sm: 1.2, md: 1.8 },
+            height: "calc(100vh - 57px)", // Set height to fit the viewport
+          }}
+        >
+          
           <Typography
-            variant="h6"
-            component={"span"}
+            variant="subtitle1"
+            fontWeight={500}
+            marginTop={2}
             sx={{ fontSize: "1.5rem" }}
           >
             New Customer
           </Typography>
+
           {/* Customer Type */}
-          <Box sx={{ display: "flex", gap: 8, alignItems: "center" }}>
-            <Typography>Customer Type</Typography>
-            <FormControl>
-              <RadioGroup row value={value} onChange={handleChange}>
-                <FormControlLabel
-                  value="Business"
-                  control={<Radio />}
-                  label="Business"
-                />
-                <FormControlLabel
-                  value="Individual"
-                  control={<Radio />}
-                  label="Individual"
-                />
-              </RadioGroup>
-            </FormControl>
-          </Box>
-          {/* primary Contact Input Field */}
           <Box
             sx={{
               display: "flex",
-              mt: 1,
+              gap: { xs: 2, md: 8 },
               alignItems: "center",
-              gap: 7,
-              fontWeight: 400,
+              flexDirection: { xs: "column", sm: "row" },
+              mt: 2,
+            }}
+          >
+            <Typography>Customer Type</Typography>
+            
+          </Box>
+
+          {/* Primary Contact */}
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: { xs: "column", md: "row" },
+              mt: 2,
+              gap: { xs: 2, md: 7 },
+              alignItems: "center",
             }}
           >
             <Typography variant="subtitle1">Primary Contact</Typography>
             <Box
-              sx={{ display: "flex", justifyContent: "space-between", gap: 3 }}
+              sx={{
+                display: "flex",
+                gap: { xs: 2, md: 3 },
+                flexDirection: { xs: "column", sm: "row" },
+              }}
             >
               <Autocomplete
                 size="small"
                 {...salutationName}
-                id="salutationName"
                 disableClearable
                 renderInput={(params) => (
                   <StyledTextField
-                    sx={{ width: 170 }}
+                    sx={{ width: { xs: "100%", sm: 170 } }}
                     size="small"
-                    placeholder="salutation"
+                    required
+                    placeholder="Salutation"
                     {...params}
-                    variant="outlined"
                   />
                 )}
               />
               <StyledTextField
                 size="small"
-                sx={{ width: 170 }}
-                placeholder="FirstName"
+                sx={{ width: { xs: "100%", sm: 170 } }}
+                placeholder="First Name"
               />
               <StyledTextField
                 size="small"
-                sx={{ width: 170 }}
-                placeholder="LastName"
+                sx={{ width: { xs: "100%", sm: 170 } }}
+                placeholder="Last Name"
               />
             </Box>
           </Box>
-          {/* company Name Input Field */}
+
+          {/* Company Name */}
           <Box
             sx={{
               display: "flex",
-              mt: 1,
+              flexDirection: { xs: "column", md: "row" },
+              mt: 2,
+              gap: { xs: 2, md: 7 },
               alignItems: "center",
-              gap: 7,
-              fontWeight: 400,
             }}
           >
-            <Typography variant="subtitle1">Company Name</Typography>
-            <Box width={558}>
+            <Typography variant="subtitle1" fontSize={"1rem"}>
+              Company Name
+            </Typography>
+            <Box sx={{ width: { xs: "100%", md: 558 } }}>
               <StyledTextField fullWidth size="small" />
             </Box>
           </Box>
-          {/* customer Display Name Input Field  */}
+
+          {/* Customer Display Name */}
           <Box
             sx={{
               display: "flex",
-              mt: 1,
+              flexDirection: { xs: "column", md: "row" },
+              mt: 2,
+              gap: { xs: 2, md: 5.3 },
               alignItems: "center",
-              gap: 5.3,
-              fontWeight: 400,
             }}
           >
             <Typography variant="subtitle1">
-              Customer Display<br></br> Name*
+              Customer Display
+              <br /> Name*
             </Typography>
-            <Box width={558}>
+            <Box sx={{ width: { xs: "100%", md: 558 } }}>
               <Autocomplete
                 size="small"
                 {...customerDisplayName}
-                id="customerDisplayName"
                 disableClearable
                 renderInput={(params) => (
-                  <StyledTextField
+                  <TextField
                     fullWidth
                     size="small"
                     {...params}
-                    variant="outlined"
+                    sx={styledTextField}
                   />
                 )}
               />
             </Box>
           </Box>
-          {/* Currency Input Field */}
+
+          {/* Currency Name */}
           <Box
             sx={{
               display: "flex",
-              mt: 1,
+              flexDirection: { xs: "column", md: "row" },
+              mt: 2,
+              gap: { xs: 2, md: 7.1 },
               alignItems: "center",
-              gap: 7.1,
-              fontWeight: 400,
             }}
           >
             <Typography variant="subtitle1">Currency Name</Typography>
-            <Box width={558}>
+            <Box sx={{ width: { xs: "100%", md: 558 } }}>
               <Autocomplete
                 size="small"
                 {...currencyName}
-                id="currencyName"
                 disableClearable
                 renderInput={(params) => (
-                  <StyledTextField
-                    placeholder="INR-Indian Rupees"
+                  <TextField
+                    placeholder="INR - Indian Rupees"
                     fullWidth
                     size="small"
                     {...params}
-                    variant="outlined"
+                    sx={styledTextField}
                   />
                 )}
               />
             </Box>
           </Box>
-          {/* Customer E-mail Input Field */}
+
+          {/* Customer E-mail */}
           <Box
             sx={{
               display: "flex",
-              mt: 1,
+              flexDirection: { xs: "column", md: "row" },
+              mt: 2,
+              gap: { xs: 2, md: 6 },
               alignItems: "center",
-              gap: 6,
-              fontWeight: 400,
             }}
           >
             <Typography variant="subtitle1">Customer E-Mail</Typography>
-            <Box width={558}>
-              <StyledTextField fullWidth size="small" />
+            <Box sx={{ width: { xs: "100%", md: 558 } }}>
+              <TextField
+                fullWidth
+                size="small"
+                value={email}
+                onChange={handleEmailChange}
+                error={emailError}
+                helperText={
+                  emailError ? "Please enter a valid email address" : ""
+                }
+                sx={styledTextField}
+              />
             </Box>
           </Box>
-          {/* Customer Contact Details Input Field */}
+
+          {/* Customer Contact Details */}
           <Box
             sx={{
               display: "flex",
-              mt: 1,
+              flexDirection: { xs: "column", md: "row" },
+              mt: 2,
+              gap: { xs: 2, md: 4.5 },
               alignItems: "center",
-              gap: 4.5,
-              fontWeight: 400,
             }}
           >
             <Typography variant="subtitle1">
-              Customer Contact<br></br> Details
+              Customer Contact
+              <br /> Details
             </Typography>
-            <Box width={558} display={"flex"} gap={1}>
-              <StyledTextField
+            <Box
+              sx={{
+                display: "flex",
+                gap: { xs: 2, md: 1 },
+                width: { xs: "100%", md: 558 },
+              }}
+            >
+              <TextField
                 size="small"
-                sx={{ width: 279 }}
-                placeholder="WorkPhone"
+                type="number"
+                value={workPhone}
+                onChange={handleWorkPhoneChange}
+                placeholder="Work Phone"
+                error={workPhoneError}
+                helperText={
+                  workPhoneError
+                    ? "Please enter a valid 10-digit mobile number"
+                    : ""
+                }
+                sx={{
+                  width: { xs: "100%", md: 279 },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#F3F3F3",
+
+                    "&:hover": {
+                      backgroundColor: "#F3F3F3",
+                    },
+                    "&.Mui-focused": {
+                      backgroundColor: "#EBF9FF", // Focused background color
+                      borderColor: "#5BC4FA", // Focused border color
+                    },
+                  },
+                }}
               />
-              <StyledTextField
+
+              <TextField
                 size="small"
-                sx={{ width: 279 }}
+                type="number"
                 placeholder="Mobile"
+                value={mobile}
+                onChange={handleMobileChange}
+                error={mobileError}
+                helperText={
+                  mobileError
+                    ? "Please enter a valid 10-digit mobile number"
+                    : ""
+                }
+                sx={{
+                  width: { xs: "100%", md: 279 },
+                  "& .MuiOutlinedInput-root": {
+                    backgroundColor: "#F3F3F3",
+
+                    "&:hover": {
+                      backgroundColor: "#F3F3F3",
+                    },
+                    "&.Mui-focused": {
+                      backgroundColor: "#EBF9FF", // Focused background color
+                      borderColor: "#5BC4FA", // Focused border color
+                    },
+                  },
+                }}
               />
             </Box>
           </Box>
-          <StyledButton onClick={callAddMoreToggle} variant="text">
-            {addmore ? "-AddMore" : "+AddMore"}
-          </StyledButton>
         </Box>
+       
         {/* Tab Section */}
-        {addmore && (
-          <>
+  
             <Tabs
-              sx={{ borderBottom: "3px solid #EFEFEF" }}
+              sx={{ borderBottom: "3px solid #EFEFEF",mt:1.2 }}
               value={tabsValue}
               onChange={handleTabChange}
             >
@@ -548,77 +753,98 @@ const NewCustomer = () => {
                     display: "flex",
                     mt: 1,
                     alignItems: "center",
-                    gap: 7.1,
+                    gap: { xs: 2, sm: 4, md: 7.1 }, // Responsive gaps
                     fontWeight: 400,
+                    flexDirection: { xs: "column", sm: "row" }, // Stack vertically on small screens
                   }}
                 >
                   <Typography variant="subtitle1">Gst Treatment*</Typography>
-                  <Box width={558}>
+                  <Box sx={{ width: { xs: "100%", sm: "70%", md: 558 } }}>
                     <Autocomplete
                       size="small"
                       {...GstTreatmentName}
                       id="GstTreatmentName"
                       disableClearable
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           placeholder="Select a GST treatment"
                           fullWidth
                           size="small"
                           {...params}
                           variant="outlined"
+                          sx={styledTextField}
                         />
                       )}
                     />
                   </Box>
                 </Box>
+
                 {/* Place of Supply */}
                 <Box
                   sx={{
                     display: "flex",
                     mt: 1,
                     alignItems: "center",
-                    gap: 6,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 6 }, // Responsive gaps
+                    flexDirection: { xs: "column", sm: "row" }, // Stack vertically on small screens
                   }}
                 >
                   <Typography variant="subtitle1">Place of Supply*</Typography>
-                  <Box width={558}>
+                  <Box sx={{ width: { xs: "100%", sm: "70%", md: 558 } }}>
                     <Autocomplete
                       size="small"
                       {...placeofSupplyName}
                       id="placeofSupplyName"
                       disableClearable
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           required
                           fullWidth
                           size="small"
                           {...params}
                           variant="outlined"
+                          sx={styledTextField}
                         />
                       )}
                     />
                   </Box>
                 </Box>
-                {/* pan Input field */}
 
+                {/* PAN */}
                 <Box
                   sx={{
                     display: "flex",
                     mt: 1,
                     alignItems: "center",
-                    gap: 17.3,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 17.3 }, // Responsive gaps
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
                   <Typography variant="subtitle1">Pan</Typography>
-                  <Box width={558}>
-                    <StyledTextField fullWidth size="small" />
+                  <Box sx={{ width: { xs: "100%", sm: "70%", md: 558 } }}>
+                    <TextField
+                      fullWidth
+                      size="small"
+                      value={pan}
+                      onChange={handlePanChange}
+                      error={error}
+                      helperText={
+                        error ? "Please enter a valid PAN number" : ""
+                      }
+                      sx={styledTextField}
+                    />
                   </Box>
                 </Box>
-                {/* Tax Preference Input Field */}
+
+                {/* Tax Preference */}
                 <Box
-                  sx={{ display: "flex", gap: 7, mt: 1, alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    gap: { xs: 2, sm: 4, md: 7 },
+                    mt: 1,
+                    alignItems: "center",
+                    flexDirection: { xs: "column", sm: "row" },
+                  }}
                 >
                   <Typography>Tax Preference*</Typography>
                   <FormControl>
@@ -636,38 +862,47 @@ const NewCustomer = () => {
                     </RadioGroup>
                   </FormControl>
                 </Box>
-                {/* payment Terms input field */}
+
+                {/* Payment Terms */}
                 <Box
                   sx={{
                     display: "flex",
                     mt: 1,
                     alignItems: "center",
-                    gap: 6.5,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 6.5 },
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
                   <Typography variant="subtitle1">Payment Terms</Typography>
-                  <Box width={558}>
+                  <Box sx={{ width: { xs: "100%", sm: "70%", md: 558 } }}>
                     <Autocomplete
                       size="small"
                       {...paymentTerms}
                       id="paymentTerms"
                       disableClearable
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           placeholder="Due on Receipt"
                           fullWidth
                           size="small"
                           {...params}
                           variant="outlined"
+                          sx={styledTextField}
                         />
                       )}
                     />
                   </Box>
                 </Box>
-                {/* Enable portal Access */}
+
+                {/* Enable Portal */}
                 <Box
-                  sx={{ display: "flex", gap: 8, mt: 1, alignItems: "center" }}
+                  sx={{
+                    display: "flex",
+                    gap: { xs: 2, sm: 4, md: 8 },
+                    mt: 1,
+                    alignItems: "center",
+                    flexDirection: { xs: "column", sm: "row" },
+                  }}
                 >
                   <Typography>Enable Portal?</Typography>
                   <FormControlLabel
@@ -676,35 +911,7 @@ const NewCustomer = () => {
                     label="Allow Portal access for this customer"
                   />
                 </Box>
-                {/* Portal Language */}
-                <Box
-                  sx={{
-                    display: "flex",
-                    mt: 1,
-                    alignItems: "center",
-                    gap: 6,
-                    fontWeight: 400,
-                  }}
-                >
-                  <Typography variant="subtitle1">portal Language </Typography>
-                  <Box width={558}>
-                    <Autocomplete
-                      size="small"
-                      {...portalLanguage}
-                      id="portalLanguage"
-                      disableClearable
-                      renderInput={(params) => (
-                        <StyledTextField
-                          placeholder="Select Portal Language"
-                          fullWidth
-                          size="small"
-                          {...params}
-                          variant="outlined"
-                        />
-                      )}
-                    />
-                  </Box>
-                </Box>
+
                 {/* Upload Documents */}
                 <Box
                   sx={{
@@ -712,8 +919,8 @@ const NewCustomer = () => {
                     mt: 2,
                     mb: 1.5,
                     alignItems: "center",
-                    gap: 11,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 11 },
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
                   <Typography variant="subtitle1">Documents</Typography>
@@ -739,23 +946,17 @@ const NewCustomer = () => {
                         multiple
                       />
                     </Button>
-
-                    {/* Display uploaded file names */}
                     {files.length > 0 && (
                       <Typography variant="caption">
                         Uploaded Files:{" "}
                         {files.map((file) => file.name).join(", ")}
                       </Typography>
                     )}
-
-                    {/* Error message for validation */}
                     {errorMessage && (
                       <Typography variant="caption" color="#D32F2F">
                         {errorMessage}
                       </Typography>
                     )}
-
-                    {/* Success message for successful upload */}
                     {uploadSuccess && (
                       <Typography variant="caption" color="green">
                         {uploadSuccess}
@@ -764,59 +965,60 @@ const NewCustomer = () => {
                   </Box>
                 </Box>
 
-                {/* website url Document */}
-
+                {/* Website URL Document */}
                 <Box
                   sx={{
                     display: "flex",
                     mt: 1,
                     alignItems: "center",
-                    gap: 10.5,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 9.4 }, // Responsive gap
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
-                  <Typography variant="subtitle1">Documents</Typography>
-                  <Box width={558}>
-                    <StyledTextField
-                      placeholder="Website Url"
+                  <Typography variant="subtitle1">Website URL</Typography>
+                  <Box sx={{ width: { xs: "100%", sm: "70%", md: 558 } }}>
+                    <TextField
+                      placeholder="Website URL"
                       type="url"
                       fullWidth
                       size="small"
+                      sx={styledTextField}
                     />
                   </Box>
                 </Box>
+
                 {/* Department InputField */}
                 <Box
                   sx={{
                     display: "flex",
                     mt: 1.5,
                     alignItems: "center",
-                    gap: 10,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 10 }, // Responsive gap
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
                   <Typography variant="subtitle1">Department</Typography>
-                  <Box width={558}>
-                    <StyledTextField fullWidth size="small" />
+                  <Box sx={{ width: { xs: "100%", sm: "70%", md: 558 } }}>
+                    <TextField fullWidth size="small" sx={styledTextField} />
                   </Box>
                 </Box>
-                {/* customer Owner */}
+
+                {/* Customer Owner */}
                 <Box
                   sx={{
                     display: "flex",
                     mt: 4,
-                    marginBottom: 3,
-
+                    mb: 3,
                     alignItems: "center",
-                    gap: 5,
-                    fontWeight: 400,
+                    gap: { xs: 2, sm: 4, md: 5 }, // Responsive gap
+                    flexDirection: { xs: "column", sm: "row" },
                   }}
                 >
                   <Typography variant="subtitle1">Customer Owner:</Typography>
                   <Box sx={{ display: "flex", alignItems: "center" }}>
                     <Typography color="#939393" variant="caption">
                       Assign a user as the customer owner to provide access only
-                      to the data of this customer.
+                      to the data of this customer.{" "}
                       <Box
                         component={Link}
                         sx={{ color: "#5BC4FA", textDecoration: "none" }}
@@ -831,11 +1033,25 @@ const NewCustomer = () => {
             {tabsValue === 1 && (
               <Box sx={{ padding: 3 }}>
                 {/* Billing & Shipping Address */}
-                <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" }, // Stacks on small screens
+                    justifyContent: "space-between",
+                  }}
+                >
                   <Typography variant="subtitle1" fontSize={"1.2rem"}>
                     Billing Address
                   </Typography>
-                  <Box sx={{ display: "flex", paddingRight: 12.3, gap: 1.5 }}>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      paddingRight: { xs: 0, sm: 12.3 },
+                      gap: 1.5,
+                      alignItems: "center",
+                      marginTop: { xs: 2, sm: 0 }, // Adds space when stacked on mobile
+                    }}
+                  >
                     <Typography variant="subtitle1" fontSize={"1.2rem"}>
                       Shipping Address
                     </Typography>
@@ -851,21 +1067,41 @@ const NewCustomer = () => {
                 </Box>
 
                 {/* Attention input Field */}
-                <Box display={"flex"} justifyContent={"space-between"} mt={2}>
-                  <Box display={"flex"} gap={11} alignItems={"center"}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  mt={2}
+                  flexDirection={{ xs: "column", sm: "row" }} // Stacks fields on small screens
+                >
+                  <Box
+                    display={"flex"}
+                    gap={11}
+                    alignItems={"center"}
+                    flexDirection={{ xs: "column", sm: "row" }}
+                  >
                     <Typography variant="subtitle1">Attention</Typography>
-                    <StyledTextField
+                    <TextField
                       key="billing-attention"
                       type="text"
                       size="small"
-                      value={billingAddress.attention}
+                      fullWidth
+                      value={billingAddress.attention || ""}
                       onChange={(e) =>
-                        handleInputChange(
-                          "billing",
-                          "attention",
-                          e.target.value
-                        )
+                        handleBillingAddressChange("attention", e.target.value)
                       }
+                      sx={{
+                        width: { xs: "100%", sm: 210 }, // Full width on mobile
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                   <Box
@@ -873,26 +1109,49 @@ const NewCustomer = () => {
                     gap={12.6}
                     paddingRight={8}
                     alignItems={"center"}
+                    mt={{ xs: 2, sm: 0 }} // Adds space when stacked
+                    flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Typography variant="subtitle1">Attention</Typography>
-                    <StyledTextField
+                    <TextField
                       type="text"
                       size="small"
-                      value={shippingAddress.attention}
+                      key="billing-attention"
+                      fullWidth
+                      value={shippingAddress.attention || ""}
                       onChange={(e) =>
-                        handleInputChange(
-                          "shipping",
-                          "attention",
-                          e.target.value
-                        )
+                        handleShippingAddressChange("attention", e.target.value)
                       }
+                      sx={{
+                        width: { xs: "100%", sm: 210 },
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                 </Box>
 
                 {/* Country/Region Input Field */}
-                <Box display={"flex"} justifyContent={"space-between"} mt={1.5}>
-                  <Box display={"flex"} gap={5} alignItems={"center"}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  mt={1.5}
+                  flexDirection={{ xs: "column", sm: "row" }}
+                >
+                  <Box
+                    display={"flex"}
+                    gap={5}
+                    alignItems={"center"}
+                    flexDirection={{ xs: "column", sm: "row" }}
+                  >
                     <Typography variant="subtitle1">Country/Region</Typography>
                     <Autocomplete
                       size="small"
@@ -903,11 +1162,23 @@ const NewCustomer = () => {
                         handleBillingAddressChange("countryRegion", newValue)
                       }
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           {...params}
                           size="small"
-                          sx={{ width: 210 }}
                           placeholder="Select"
+                          sx={{
+                            width: { xs: "100%", sm: 210 },
+                            "& .MuiOutlinedInput-root": {
+                              backgroundColor: "#F3F3F3",
+                              "&:hover": {
+                                backgroundColor: "#F3F3F3",
+                              },
+                              "&.Mui-focused": {
+                                backgroundColor: "#EBF9FF",
+                                borderColor: "#5BC4FA",
+                              },
+                            },
+                          }}
                         />
                       )}
                     />
@@ -917,6 +1188,8 @@ const NewCustomer = () => {
                     gap={7}
                     paddingRight={8}
                     alignItems={"center"}
+                    mt={{ xs: 2, sm: 0 }}
+                    flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Typography variant="subtitle1">Country/Region</Typography>
                     <Autocomplete
@@ -928,11 +1201,23 @@ const NewCustomer = () => {
                         handleShippingAddressChange("countryRegion", newValue)
                       }
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           {...params}
                           size="small"
-                          sx={{ width: 210 }}
                           placeholder="Select"
+                          sx={{
+                            width: { xs: "100%", sm: 210 },
+                            "& .MuiOutlinedInput-root": {
+                              backgroundColor: "#F3F3F3",
+                              "&:hover": {
+                                backgroundColor: "#F3F3F3",
+                              },
+                              "&.Mui-focused": {
+                                backgroundColor: "#EBF9FF",
+                                borderColor: "#5BC4FA",
+                              },
+                            },
+                          }}
                         />
                       )}
                     />
@@ -940,19 +1225,42 @@ const NewCustomer = () => {
                 </Box>
 
                 {/* Address Input Field */}
-                <Box display={"flex"} justifyContent={"space-between"} mt={1.5}>
-                  <Box display={"flex"} gap={11.5} alignItems={"center"}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  mt={1.5}
+                  flexDirection={{ xs: "column", sm: "row" }}
+                >
+                  <Box
+                    display={"flex"}
+                    gap={11.5}
+                    alignItems={"center"}
+                    flexDirection={{ xs: "column", sm: "row" }}
+                  >
                     <Typography variant="subtitle1">Address</Typography>
-                    <StyledTextField
+                    <TextField
                       multiline
                       placeholder="Street1"
                       rows={2}
                       size="small"
-                      value={billingAddress.address}
+                      fullWidth
+                      value={billingAddress.address || ""}
                       onChange={(e) =>
                         handleBillingAddressChange("address", e.target.value)
                       }
-                      sx={{ width: 210, padding: 0 }}
+                      sx={{
+                        width: { xs: "100%", sm: 210 },
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                   <Box
@@ -960,33 +1268,72 @@ const NewCustomer = () => {
                     gap={13.7}
                     paddingRight={8}
                     alignItems={"center"}
+                    mt={{ xs: 2, sm: 0 }}
+                    flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Typography variant="subtitle1">Address</Typography>
-                    <StyledTextField
+                    <TextField
                       multiline
                       placeholder="Street1"
                       rows={2}
                       size="small"
-                      value={shippingAddress.address}
+                      fullWidth
+                      value={shippingAddress.address || ""}
                       onChange={(e) =>
                         handleShippingAddressChange("address", e.target.value)
                       }
-                      sx={{ width: 210, padding: 0 }}
+                      sx={{
+                        width: { xs: "100%", sm: 210 },
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                 </Box>
 
                 {/* City Input Field */}
-                <Box display={"flex"} justifyContent={"space-between"} mt={2}>
-                  <Box display={"flex"} gap={15.5} alignItems={"center"}>
+                <Box
+                  display={"flex"}
+                  justifyContent={"space-between"}
+                  flexDirection={{ xs: "column", sm: "row" }}
+                  mt={2}
+                >
+                  <Box
+                    display={"flex"}
+                    gap={15.5}
+                    alignItems={"center"}
+                    flexDirection={{ xs: "column", sm: "row" }}
+                  >
                     <Typography variant="subtitle1">City</Typography>
-                    <StyledTextField
+                    <TextField
                       type="text"
                       size="small"
-                      value={billingAddress.city}
+                      value={billingAddress.city || ""}
                       onChange={(e) =>
                         handleBillingAddressChange("city", e.target.value)
                       }
+                      sx={{
+                        width: { xs: "100%", sm: 210 },
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF", // Focused background color
+                            borderColor: "#5BC4FA", // Focused border color
+                          },
+                        },
+                      }}
                     />
                   </Box>
                   <Box
@@ -994,15 +1341,31 @@ const NewCustomer = () => {
                     gap={18}
                     paddingRight={8}
                     alignItems={"center"}
+                    mt={{ xs: 2, sm: 0 }}
+                    flexDirection={{ xs: "column", sm: "row" }}
                   >
                     <Typography variant="subtitle1">City</Typography>
-                    <StyledTextField
+                    <TextField
                       type="text"
                       size="small"
-                      value={shippingAddress.city}
+                      value={shippingAddress.city || ""}
                       onChange={(e) =>
                         handleShippingAddressChange("city", e.target.value)
                       }
+                      sx={{
+                        width: { xs: "100%", sm: 210 },
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF", // Focused background color
+                            borderColor: "#5BC4FA", // Focused border color
+                          },
+                        },
+                      }}
                     />
                   </Box>
                 </Box>
@@ -1020,11 +1383,25 @@ const NewCustomer = () => {
                         handleBillingAddressChange("state", newValue)
                       }
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           {...params}
                           size="small"
-                          sx={{ width: 210 }}
                           placeholder="Select State"
+                          sx={{
+                            width: 210,
+
+                            "& .MuiOutlinedInput-root": {
+                              backgroundColor: "#F3F3F3",
+
+                              "&:hover": {
+                                backgroundColor: "#F3F3F3",
+                              },
+                              "&.Mui-focused": {
+                                backgroundColor: "#EBF9FF", // Focused background color
+                                borderColor: "#5BC4FA", // Focused border color
+                              },
+                            },
+                          }}
                         />
                       )}
                     />
@@ -1045,30 +1422,72 @@ const NewCustomer = () => {
                         handleShippingAddressChange("state", newValue)
                       }
                       renderInput={(params) => (
-                        <StyledTextField
+                        <TextField
                           {...params}
                           size="small"
-                          sx={{ width: 210 }}
                           placeholder="Select State"
+                          sx={{
+                            width: 210,
+
+                            "& .MuiOutlinedInput-root": {
+                              backgroundColor: "#F3F3F3",
+
+                              "&:hover": {
+                                backgroundColor: "#F3F3F3",
+                              },
+                              "&.Mui-focused": {
+                                backgroundColor: "#EBF9FF", // Focused background color
+                                borderColor: "#5BC4FA", // Focused border color
+                              },
+                            },
+                          }}
                         />
                       )}
                     />
                   </Box>
                 </Box>
 
-                {/* Pin Code input Field */}
+                {/* Pin Code Input Field */}
                 <Box display={"flex"} justifyContent={"space-between"} mt={2}>
+                  {/* Pin Code Input Field */}
                   <Box display={"flex"} gap={10.5} alignItems={"center"}>
                     <Typography variant="subtitle1">Pin Code</Typography>
-                    <StyledTextField
-                      type="number"
+                    <TextField
                       size="small"
-                      value={billingAddress.pinCode}
-                      onChange={(e) =>
-                        handleBillingAddressChange("pinCode", e.target.value)
+                      value={billingAddress.pinCode || ""}
+                      onChange={(e) => {
+                        const pinCode = e.target.value;
+                        // Allow only numeric input
+                        if (pinCode === "" || /^[0-9]{0,6}$/.test(pinCode)) {
+                          handleBillingAddressChange("pinCode", pinCode);
+                        }
+                      }}
+                      error={
+                        billingAddress.pinCode &&
+                        !validatePinCode(billingAddress.pinCode)
                       }
+                      helperText={
+                        billingAddress.pinCode &&
+                        !validatePinCode(billingAddress.pinCode)
+                          ? "Pin Code must be exactly 6 digits"
+                          : ""
+                      }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
+
+                  {/* Shipping Address Pin Code Input */}
                   <Box
                     display={"flex"}
                     gap={13.6}
@@ -1076,30 +1495,82 @@ const NewCustomer = () => {
                     alignItems={"center"}
                   >
                     <Typography variant="subtitle1">Pin Code</Typography>
-                    <StyledTextField
-                      type="number"
+                    <TextField
                       size="small"
-                      value={shippingAddress.pinCode}
-                      onChange={(e) =>
-                        handleShippingAddressChange("pinCode", e.target.value)
+                      value={shippingAddress.pinCode || ""}
+                      onChange={(e) => {
+                        const pinCode = e.target.value;
+                        // Allow only numeric input
+                        if (pinCode === "" || /^[0-9]{0,6}$/.test(pinCode)) {
+                          handleShippingAddressChange("pinCode", pinCode);
+                        }
+                      }}
+                      error={
+                        shippingAddress.pinCode &&
+                        !validatePinCode(shippingAddress.pinCode)
                       }
+                      helperText={
+                        shippingAddress.pinCode &&
+                        !validatePinCode(shippingAddress.pinCode)
+                          ? "Pin Code must be exactly 6 digits"
+                          : ""
+                      }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                 </Box>
 
-                {/* Phone input Field */}
+                {/* Phone Number Input Field */}
                 <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                   <Box display={"flex"} gap={13} alignItems={"center"}>
                     <Typography variant="subtitle1">Phone</Typography>
-                    <StyledTextField
-                      type="number"
+                    <TextField
                       size="small"
-                      value={billingAddress.phone}
-                      onChange={(e) =>
-                        handleBillingAddressChange("phone", e.target.value)
+                      value={billingAddress.phone || ""}
+                      onChange={(e) => {
+                        const phone = e.target.value;
+                        // Allow only numeric input
+                        if (phone === "" || /^[0-9]{0,10}$/.test(phone)) {
+                          handleBillingAddressChange("phone", phone);
+                        }
+                      }}
+                      error={
+                        billingAddress.phone &&
+                        !validatePhoneNumber(billingAddress.phone)
                       }
+                      helperText={
+                        billingAddress.phone &&
+                        !validatePhoneNumber(billingAddress.phone)
+                          ? "Phone number must be exactly 10 digits"
+                          : ""
+                      }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
+
+                  {/* Shipping Address Phone Number Input */}
                   <Box
                     display={"flex"}
                     gap={16.3}
@@ -1107,13 +1578,38 @@ const NewCustomer = () => {
                     alignItems={"center"}
                   >
                     <Typography variant="subtitle1">Phone</Typography>
-                    <StyledTextField
-                      type="number"
+                    <TextField
                       size="small"
-                      value={shippingAddress.phone}
-                      onChange={(e) =>
-                        handleShippingAddressChange("phone", e.target.value)
+                      value={shippingAddress.phone || ""}
+                      onChange={(e) => {
+                        const phone = e.target.value;
+                        // Allow only numeric input
+                        if (phone === "" || /^[0-9]{0,10}$/.test(phone)) {
+                          handleShippingAddressChange("phone", phone);
+                        }
+                      }}
+                      error={
+                        shippingAddress.phone &&
+                        !validatePhoneNumber(shippingAddress.phone)
                       }
+                      helperText={
+                        shippingAddress.phone &&
+                        !validatePhoneNumber(shippingAddress.phone)
+                          ? "Phone number must be exactly 10 digits"
+                          : ""
+                      }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                 </Box>
@@ -1122,13 +1618,38 @@ const NewCustomer = () => {
                 <Box display={"flex"} justifyContent={"space-between"} mt={2}>
                   <Box display={"flex"} gap={7.7} alignItems={"center"}>
                     <Typography variant="subtitle1">Fax Number</Typography>
-                    <StyledTextField
-                      type="number"
+                    <TextField
                       size="small"
-                      value={billingAddress.faxNumber}
-                      onChange={(e) =>
-                        handleBillingAddressChange("faxNumber", e.target.value)
+                      value={billingAddress.faxNumber || ""}
+                      onChange={(e) => {
+                        const fax = e.target.value;
+                        // Allow only numeric input
+                        if (fax === "" || /^[0-9]{0,12}$/.test(fax)) {
+                          handleBillingAddressChange("faxNumber", fax);
+                        }
+                      }}
+                      error={
+                        billingAddress.faxNumber &&
+                        !validateFaxNumber(billingAddress.faxNumber)
                       }
+                      helperText={
+                        billingAddress.faxNumber &&
+                        !validateFaxNumber(billingAddress.faxNumber)
+                          ? "Fax number must be between 6 and 12 digits"
+                          : ""
+                      }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                   <Box
@@ -1138,13 +1659,38 @@ const NewCustomer = () => {
                     alignItems={"center"}
                   >
                     <Typography variant="subtitle1">Fax Number</Typography>
-                    <StyledTextField
-                      type="number"
+                    <TextField
                       size="small"
-                      value={shippingAddress.faxNumber}
-                      onChange={(e) =>
-                        handleShippingAddressChange("faxNumber", e.target.value)
+                      value={shippingAddress.faxNumber || ""}
+                      onChange={(e) => {
+                        const fax = e.target.value;
+                        // Allow only numeric input
+                        if (fax === "" || /^[0-9]{0,12}$/.test(fax)) {
+                          handleShippingAddressChange("faxNumber", fax);
+                        }
+                      }}
+                      error={
+                        shippingAddress.faxNumber &&
+                        !validateFaxNumber(shippingAddress.faxNumber)
                       }
+                      helperText={
+                        shippingAddress.faxNumber &&
+                        !validateFaxNumber(shippingAddress.faxNumber)
+                          ? "Fax number must be between 6 and 12 digits"
+                          : ""
+                      }
+                      sx={{
+                        "& .MuiOutlinedInput-root": {
+                          backgroundColor: "#F3F3F3",
+                          "&:hover": {
+                            backgroundColor: "#F3F3F3",
+                          },
+                          "&.Mui-focused": {
+                            backgroundColor: "#EBF9FF",
+                            borderColor: "#5BC4FA",
+                          },
+                        },
+                      }}
                     />
                   </Box>
                 </Box>
@@ -1205,10 +1751,13 @@ const NewCustomer = () => {
                   sx={{
                     maxHeight: { xs: "400px", md: "auto" },
                     overflowY: "auto",
-                    overflowX: "hidden",
+                    overflowX: { xs: "scroll", md: "hidden" }, // Enable horizontal scrolling on mobile
+                    width: "100%",
                   }}
                 >
-                  <Table>
+                  <Table sx={{ minWidth: { xs: "600px", md: "100%" } }}>
+                    {" "}
+                    {/* Set a min-width for smaller screens */}
                     <TableHead sx={{ backgroundColor: "#F3F3F3" }}>
                       <TableRow>
                         <TableCell align="center">Salutation</TableCell>
@@ -1248,12 +1797,14 @@ const NewCustomer = () => {
                     </TableBody>
                   </Table>
                 </TableContainer>
+
+                {/* Add Contact Person Button */}
                 <Box marginBottom={2} marginTop={3}>
                   <Typography
                     variant="subtitle1"
                     component={Button}
                     sx={{
-                      color: "#5BC4FA",
+                      color: "#6666FF",
                       fontSize: "0.95rem",
                       textTransform: "none",
                     }}
@@ -1265,40 +1816,63 @@ const NewCustomer = () => {
             )}
 
             {tabsValue === 3 && (
-              <Box padding={6}>
+              <Box padding={{ xs: 2, sm: 3, md: 6 }}>
                 <Box
-                  display={"flex"}
-                  gap={1}
-                  alignItems={"center"}
+                  display="flex"
+                  flexDirection={{ xs: "column", sm: "row" }}
+                  gap={{ xs: 0.5, sm: 1 }}
+                  alignItems={{ xs: "flex-start", sm: "center" }}
                   marginBottom={2}
                 >
                   <Typography variant="subtitle1">Remarks</Typography>
                   <Typography
                     variant="body2"
-                    component={"span"}
-                    color={"#939393"}
+                    component="span"
+                    color="#939393"
+                    sx={{ marginLeft: { sm: 1 } }}
                   >
                     (For Internal Use)
                   </Typography>
                 </Box>
+
                 <Box>
                   <StyledTextField
+                  
                     multiline
                     rows={2.5}
                     size="small"
                     fullWidth
+                    sx={{
+                      width: {
+                        xs: "100%",
+                        sm: "100%",
+                      } /* Full width for all screen sizes */,
+                    }}
                   />
                 </Box>
               </Box>
             )}
-          </>
-        )}
-
-        {/* footerButtons */}
+          
+        
 
         {/* Footer Buttons */}
         <Box
-          sx={{ display: "flex", p: 2, boxShadow: "1px 0px 2.5px #00000040" }}
+          sx={{
+            display: "flex",
+            position: "sticky", // Fixed to the bottom of the viewport
+            bottom: 1,
+            left: 0,
+            right: 0,
+            padding: "16px 14px 27px 10px",
+            
+           
+            boxShadow: "-2.5px -2px 2.0px #EFEFEF",
+            marginRight: 1.8,
+            backgroundColor: "white",
+            transition: "transform 0.3s ease", // Smooth transition
+            transform: isFooterVisible ? "translateY(0)" : "translateY(100%)", // Toggle visibility
+            zIndex: 1000, // Keep it above other elements
+          }}
         >
           {/* Conditionally render buttons */}
           {!isLastTab ? (
@@ -1306,9 +1880,9 @@ const NewCustomer = () => {
               variant="contained"
               sx={{
                 marginRight: 2,
-                backgroundColor: "#5BC4FA",
+                backgroundColor: "#6666FF",
                 textTransform: "none",
-                width:80
+                width: 80,
               }}
               onClick={handleNextClick}
             >
@@ -1320,7 +1894,7 @@ const NewCustomer = () => {
                 variant="contained"
                 sx={{
                   marginRight: 2,
-                  backgroundColor: "#5BC4FA",
+                  backgroundColor: "#6666FF",
                   textTransform: "none",
                 }}
               >
@@ -1341,7 +1915,7 @@ const NewCustomer = () => {
           )}
         </Box>
       </Box>
-    </Box>
+    </>
   );
 };
 

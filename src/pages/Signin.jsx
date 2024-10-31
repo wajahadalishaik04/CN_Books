@@ -18,7 +18,7 @@ const Signin = () => {
   const isMobile = useMediaQuery("(max-width:600px)");
 
   const StyledButton = styled(Button)({
-    backgroundColor: "#5BC4FA",
+    backgroundColor: "#6666FF",
     marginTop: 12,
     textTransform: "none",
     fontSize: "1rem",
@@ -55,6 +55,13 @@ const Signin = () => {
     }
   };
 
+  // Keyboard event handler for "Enter" key
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") {
+      handleSubmit();
+    }
+  };
+
   return (
     <Box
       display="flex"
@@ -81,7 +88,7 @@ const Signin = () => {
         {/* Left Side - Login Form */}
         <Box flex={1} p={4.5} mt={1}>
           <Box display="flex" justifyContent="space-between" alignItems="center">
-            <img src={images.codersnestLogo} alt="Logo" style={{ width: 200 }} />
+            <img src={images.CN_Horizontal} alt="Logo" style={{ width: 180, maxWidth:"100%"}} />
           </Box>
           <Box width={isMobile ? "100%" : "330px"} flex={1}>
             <Typography variant="h5" fontWeight={500} mt={2}>
@@ -99,6 +106,7 @@ const Signin = () => {
               placeholder="Enter Email Id/ Mobile Number"
               value={inputValue}
               onChange={handleInputChange}
+              onKeyDown={handleKeyDown} // Keyboard event for Enter key
               error={formSubmitted && emailMobileError} // Show error if form submitted and input invalid
               helperText={formSubmitted && emailMobileError ? "Enter a valid Email or Mobile Number." : ""}
               sx={{
@@ -127,19 +135,25 @@ const Signin = () => {
           </Box>
 
           {/* Social Icons */}
-          <Box display="flex" justifyContent="flex-start" gap={2} mt={2}>
-            <img src={images.googleicon} width={24} alt="googleicon" />
-            <img src={images.facebookicon} width={24} alt="facebookicon" />
-            <img src={images.linkedinicon} width={24} alt="linkedinicon" />
-            <img src={images.xicon} width={24} alt="xicon" />
-            <img src={images.appleicon} width={24} alt="appleicon" />
-            <img src={images.windowsicon} width={24} alt="windowsicon" />
+          <Box
+            display="flex"
+            justifyContent={ "flex-start"}
+            gap={2}
+            mt={2}
+            
+          >
+            <img src={images.googleicon} width={24}  alt="googleicon" />
+            <img src={images.facebookicon} width={24}  alt="facebookicon" />
+            <img src={images.linkedinicon} width={24}  alt="linkedinicon" />
+            <img src={images.xicon} width={24} alt="xicon " />
+            <img src={images.appleicon} width={24}  alt="appleicon" />
+            <img src={images.windowsicon} width={24}  alt="windowsicon" />
           </Box>
           <Typography variant="body2" sx={{ fontWeight: 400 }} mt={2}>
             Don’t have a CN books Account?{" "}
             <Link
               to={"/signup"}
-              style={{ color: "#5BC4FA", fontSize: "1rem", textDecoration: "none" }}
+              style={{ color: "#6666FF", fontSize: "1rem", textDecoration: "none" }}
             >
               Sign Up Now
             </Link>
@@ -158,8 +172,8 @@ const Signin = () => {
             <img
               src={images.loginImg}
               alt="Illustration"
-              width="98%"
-              height="95%"
+              width="94%"
+              height="90%"
               objectFit="cover"
             />
           </Box>
